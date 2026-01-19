@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-export default function QuizScreen() {
+export default function NotesScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Quiz</Text>
+      <Text style={styles.title}>Notes</Text>
     </View>
   );
 }
