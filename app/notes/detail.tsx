@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { theme } from '../../src/theme/tokens';
-import { notes, Note } from '../../src/data/notes.seed';
+import { notes } from '../../src/data/notes.seed';
+import type { Note } from '../../src/data/types';
 import { getBookmarkedNoteIds, toggleBookmark } from '../../src/storage/bookmarks';
 import AppHeader from '../../src/ui/AppHeader';
 
@@ -18,12 +19,10 @@ export default function NotesDetailScreen() {
 
     if (foundNote) {
       setNote(foundNote);
-      // Load initial bookmark state
       getBookmarkedNoteIds().then(bookmarks => {
         setIsBookmarked(bookmarks.has(foundNote.id));
       });
     } else {
-      // Handle note not found, maybe redirect
       router.back();
     }
   }, [id]);
@@ -54,9 +53,8 @@ export default function NotesDetailScreen() {
         <Text style={styles.content}>{note.content}</Text>
       </ScrollView>
 
-      {/* Sticky CTA Placeholder */}
       <View style={styles.stickyCTA}>
-        <Text style={styles.ctaText}>Quick Practice</Text>
+        <Text style={styles.ctaText}>Quick Practice (Placeholder)</Text>
       </View>
     </View>
   );
@@ -69,7 +67,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: theme.spacing.md,
-    paddingBottom: 100, // To avoid overlap with sticky CTA
+    paddingBottom: 100,
   },
   title: {
     ...theme.typography.h1,

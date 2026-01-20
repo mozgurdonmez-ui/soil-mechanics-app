@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, StyleSheet, SafeAreaView } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { theme } from '../theme/tokens';
+import { theme } from '../../theme/tokens';
 
 interface AppHeaderProps {
   title: string;

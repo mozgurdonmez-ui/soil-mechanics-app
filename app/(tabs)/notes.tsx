@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { theme } from '../../src/theme/tokens';
@@ -8,6 +8,7 @@ import AppHeader from '../../src/ui/AppHeader';
 import Card from '../../src/ui/Card';
 import Chip from '../../src/ui/Chip';
 import { Feather } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 
 const TOPICS = ['All', 'Phase Relationships', 'Soil Classification', 'Effective Stress'];
 
@@ -16,10 +17,12 @@ export default function NotesScreen() {
   const [activeTopic, setActiveTopic] = useState(TOPICS[0]);
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    // Load initial bookmarks
-    getBookmarkedNoteIds().then(setBookmarkedIds);
-  }, []);
+  // useFocusEffect to reload bookmarks when the screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      getBookmarkedNoteIds().then(setBookmarkedIds);
+    }, [])
+  );
 
   const handleToggleBookmark = async (noteId: string) => {
     const newBookmarkSet = await toggleBookmark(noteId);
@@ -39,7 +42,7 @@ export default function NotesScreen() {
             <Text style={styles.noteTitle}>{item.title}</Text>
             <Pressable onPress={() => handleToggleBookmark(item.id)} hitSlop={20}>
               <Feather
-                name={isBookmarked ? 'bookmark' : 'bookmark'}
+                name="bookmark"
                 size={20}
                 color={isBookmarked ? theme.colors.primary : theme.colors.border}
               />
