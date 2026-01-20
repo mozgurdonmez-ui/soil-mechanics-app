@@ -1,3 +1,4 @@
+ feature/quiz-screen-1670358114941045606
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
 import { theme } from '../theme/tokens';
@@ -67,3 +68,9 @@ const styles = StyleSheet.create({
 });
 
 export default Button;
+
+// Placeholder for Button component
+export default function Button() {
+  return null;
+}
+main

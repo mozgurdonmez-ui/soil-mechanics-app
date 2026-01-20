@@ -1,3 +1,4 @@
+feature/quiz-screen-1670358114941045606
 import React from 'react';
 import { View, Text } from 'react-native';
 
@@ -10,3 +11,9 @@ const AppHeader = ({ title }: { title: string }) => {
 };
 
 export default AppHeader;
+=======
+// Placeholder for AppHeader component
+export default function AppHeader() {
+  return null;
+}
+main

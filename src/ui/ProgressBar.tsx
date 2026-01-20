@@ -1,3 +1,4 @@
+feature/quiz-screen-1670358114941045606
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { theme } from '../theme/tokens';
@@ -35,3 +36,9 @@ const styles = StyleSheet.create({
 });
 
 export default ProgressBar;
+
+// Placeholder for ProgressBar component
+export default function ProgressBar() {
+  return null;
+}
+ main
