@@ -1,3 +1,4 @@
+feat/phase-0-1-scaffold-8266443009613216044
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
 import { theme } from '../../theme/tokens';
@@ -21,3 +22,20 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
   },
 });
+
+feature/quiz-screen-1670358114941045606
+import React from 'react';
+import { View } from 'react-native';
+
+const Card = ({ children }: { children: React.ReactNode }) => {
+  return <View>{children}</View>;
+};
+
+export default Card;
+
+// Placeholder for Card component
+export default function Card() {
+  return null;
+}
+ main
+ main

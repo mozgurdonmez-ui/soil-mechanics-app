@@ -1,3 +1,4 @@
+feat/phase-0-1-scaffold-8266443009613216044
 import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
@@ -82,11 +83,21 @@ export default function NotesScreen() {
           </>
         }
       />
+
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+export default function NotesScreen() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Notes</Text>
+ main
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+feat/phase-0-1-scaffold-8266443009613216044
   container: { flex: 1, backgroundColor: theme.colors.background },
   listContent: { padding: theme.spacing.md },
   chipsContainer: { marginBottom: theme.spacing.lg },
@@ -95,4 +106,15 @@ const styles = StyleSheet.create({
   noteHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: theme.spacing.xs },
   noteTitle: { ...theme.typography.body, fontWeight: '600', flex: 1 },
   noteInfo: { ...theme.typography.caption, color: theme.colors.textSecondary },
+
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+ main
 });

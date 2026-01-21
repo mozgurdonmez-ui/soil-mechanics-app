@@ -1,3 +1,4 @@
+feat/phase-0-1-scaffold-8266443009613216044
 import React from 'react';
 import { View, Text, Pressable, StyleSheet, SafeAreaView } from 'react-native';
 import { Feather } from '@expo/vector-icons';
@@ -67,3 +68,24 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+
+feature/quiz-screen-1670358114941045606
+import React from 'react';
+import { View, Text } from 'react-native';
+
+const AppHeader = ({ title }: { title: string }) => {
+  return (
+    <View>
+      <Text>{title}</Text>
+    </View>
+  );
+};
+
+export default AppHeader;
+
+// Placeholder for AppHeader component
+export default function AppHeader() {
+  return null;
+}
+main
+ main
