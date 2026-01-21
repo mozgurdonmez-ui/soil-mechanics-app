@@ -10,6 +10,7 @@ interface AppHeaderProps {
   rightAction?: {
     icon: keyof typeof Feather.glyphMap;
     onPress: () => void;
+    color?: string;
   };
 }
 
@@ -26,11 +27,11 @@ export default function AppHeader({ title, showBackButton = false, rightAction }
             </Pressable>
           )}
         </View>
-        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.title} numberOfLines={1}>{title}</Text>
         <View style={styles.side}>
           {rightAction && (
             <Pressable onPress={rightAction.onPress} hitSlop={20}>
-              <Feather name={rightAction.icon} size={22} color={theme.colors.primary} />
+              <Feather name={rightAction.icon} size={22} color={rightAction.color || theme.colors.primary} />
             </Pressable>
           )}
         </View>
@@ -55,11 +56,14 @@ const styles = StyleSheet.create({
   side: {
     width: 40,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
     ...theme.typography.h2,
     fontSize: 18,
     fontWeight: '600',
     color: theme.colors.text,
+    textAlign: 'center',
+    flex: 1,
   },
 });

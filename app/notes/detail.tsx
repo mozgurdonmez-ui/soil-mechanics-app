@@ -44,8 +44,9 @@ export default function NotesDetailScreen() {
         title={note.topic}
         showBackButton
         rightAction={{
-          icon: isBookmarked ? 'bookmark' : 'bookmark',
+          icon: 'bookmark',
           onPress: handleToggleBookmark,
+          color: isBookmarked ? theme.colors.primary : theme.colors.textSecondary,
         }}
       />
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -61,23 +62,10 @@ export default function NotesDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  scrollContent: {
-    padding: theme.spacing.md,
-    paddingBottom: 100,
-  },
-  title: {
-    ...theme.typography.h1,
-    marginBottom: theme.spacing.md,
-  },
-  content: {
-    ...theme.typography.body,
-    fontSize: 18,
-    lineHeight: 28,
-  },
+  container: { flex: 1, backgroundColor: theme.colors.background },
+  scrollContent: { padding: theme.spacing.md, paddingBottom: 100 },
+  title: { ...theme.typography.h1, marginBottom: theme.spacing.md },
+  content: { ...theme.typography.body, fontSize: 18, lineHeight: 28 },
   stickyCTA: {
     position: 'absolute',
     bottom: 0,
@@ -89,9 +77,5 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
     alignItems: 'center',
   },
-  ctaText: {
-    ...theme.typography.body,
-    fontWeight: 'bold',
-    color: theme.colors.textSecondary,
-  },
+  ctaText: { ...theme.typography.body, fontWeight: 'bold', color: theme.colors.textSecondary },
 });

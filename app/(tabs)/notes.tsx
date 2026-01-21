@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { theme } from '../../src/theme/tokens';
-import { notes, Note } from '../../src/data/notes.seed';
+import { notes } from '../../src/data/notes.seed';
+import type { Note } from '../../src/data/types';
 import { getBookmarkedNoteIds, toggleBookmark } from '../../src/storage/bookmarks';
 import AppHeader from '../../src/ui/AppHeader';
 import Card from '../../src/ui/Card';
 import Chip from '../../src/ui/Chip';
 import { Feather } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
 
 const TOPICS = ['All', 'Phase Relationships', 'Soil Classification', 'Effective Stress'];
 
@@ -17,21 +17,19 @@ export default function NotesScreen() {
   const [activeTopic, setActiveTopic] = useState(TOPICS[0]);
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
 
-  // useFocusEffect to reload bookmarks when the screen is focused
   useFocusEffect(
     useCallback(() => {
       getBookmarkedNoteIds().then(setBookmarkedIds);
     }, [])
   );
 
-  const handleToggleBookmark = async (noteId: string) => {
+  const handleToggleBookmark = async (event: any, noteId: string) => {
+    event.stopPropagation();
     const newBookmarkSet = await toggleBookmark(noteId);
     setBookmarkedIds(newBookmarkSet);
   };
 
-  const filteredNotes = activeTopic === 'All'
-    ? notes
-    : notes.filter(note => note.topic === activeTopic);
+  const filteredNotes = activeTopic === 'All' ? notes : notes.filter(note => note.topic === activeTopic);
 
   const renderNoteItem = ({ item }: { item: Note }) => {
     const isBookmarked = bookmarkedIds.has(item.id);
@@ -40,7 +38,7 @@ export default function NotesScreen() {
         <Card style={styles.noteCard}>
           <View style={styles.noteHeader}>
             <Text style={styles.noteTitle}>{item.title}</Text>
-            <Pressable onPress={() => handleToggleBookmark(item.id)} hitSlop={20}>
+            <Pressable onPress={(e) => handleToggleBookmark(e, item.id)} hitSlop={20}>
               <Feather
                 name="bookmark"
                 size={20}
@@ -63,7 +61,7 @@ export default function NotesScreen() {
         keyExtractor={item => item.id}
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
-          <View>
+          <>
             <View style={styles.chipsContainer}>
               <FlatList
                 data={TOPICS}
@@ -77,11 +75,11 @@ export default function NotesScreen() {
                 keyExtractor={item => item}
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.chipsList}
+                contentContainerStyle={{ gap: theme.spacing.sm }}
               />
             </View>
             <Text style={styles.sectionTitle}>All Notes</Text>
-          </View>
+          </>
         }
       />
     </View>
@@ -89,40 +87,12 @@ export default function NotesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  listContent: {
-    padding: theme.spacing.md,
-  },
-  chipsContainer: {
-    marginBottom: theme.spacing.lg,
-  },
-  chipsList: {
-    gap: theme.spacing.sm,
-  },
-  sectionTitle: {
-    ...theme.typography.h2,
-    fontSize: 20,
-    marginBottom: theme.spacing.md,
-  },
-  noteCard: {
-    marginBottom: theme.spacing.md,
-  },
-  noteHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: theme.spacing.xs,
-  },
-  noteTitle: {
-    ...theme.typography.body,
-    fontWeight: '600',
-    flex: 1,
-  },
-  noteInfo: {
-    ...theme.typography.caption,
-    color: theme.colors.textSecondary,
-  },
+  container: { flex: 1, backgroundColor: theme.colors.background },
+  listContent: { padding: theme.spacing.md },
+  chipsContainer: { marginBottom: theme.spacing.lg },
+  sectionTitle: { ...theme.typography.h2, fontSize: 20, marginBottom: theme.spacing.md },
+  noteCard: { marginBottom: theme.spacing.md },
+  noteHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: theme.spacing.xs },
+  noteTitle: { ...theme.typography.body, fontWeight: '600', flex: 1 },
+  noteInfo: { ...theme.typography.caption, color: theme.colors.textSecondary },
 });
