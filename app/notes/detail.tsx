@@ -1,81 +1,108 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { theme } from '../../src/theme/tokens';
-import { notes } from '../../src/data/notes.seed';
-import type { Note } from '../../src/data/types';
-import { getBookmarkedNoteIds, toggleBookmark } from '../../src/storage/bookmarks';
-import AppHeader from '../../src/ui/AppHeader';
+import React, { useState, useEffect, useMemo } from 'react';
+import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { useLocalSearchParams, Stack } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { NOTES } from '@/src/data/notes.seed';
+import { Note } from '@/src/data/types';
+import { isNoteBookmarked, toggleBookmark } from '@/src/storage/bookmarks';
+import { theme } from '@/src/theme';
+import { Button } from '@/src/ui';
 
-export default function NotesDetailScreen() {
-  const router = useRouter();
+export default function NoteDetailScreen() {
   const { id } = useLocalSearchParams();
-  const [note, setNote] = useState<Note | null>(null);
+  const note = useMemo(() => NOTES.find((n) => n.id === id), [id]);
   const [isBookmarked, setIsBookmarked] = useState(false);
 
   useEffect(() => {
-    const noteId = Array.isArray(id) ? id[0] : id;
-    const foundNote = notes.find(n => n.id === noteId);
-
-    if (foundNote) {
-      setNote(foundNote);
-      getBookmarkedNoteIds().then(bookmarks => {
-        setIsBookmarked(bookmarks.has(foundNote.id));
-      });
-    } else {
-      router.back();
+    if (note) {
+      isNoteBookmarked(note.id).then(setIsBookmarked);
     }
-  }, [id]);
+  }, [note]);
 
   const handleToggleBookmark = async () => {
     if (note) {
-      await toggleBookmark(note.id);
-      setIsBookmarked(prev => !prev);
+      const newBookmarkStatus = await toggleBookmark(note.id);
+      setIsBookmarked(newBookmarkStatus);
     }
   };
 
   if (!note) {
-    return <View style={styles.container} />; // Or a loading indicator
+    return (
+      <View style={styles.container}>
+        <Text>Note not found.</Text>
+      </View>
+    );
   }
 
   return (
     <View style={styles.container}>
-      <AppHeader
-        title={note.topic}
-        showBackButton
-        rightAction={{
-          icon: 'bookmark',
-          onPress: handleToggleBookmark,
-          color: isBookmarked ? theme.colors.primary : theme.colors.textSecondary,
+      <Stack.Screen
+        options={{
+          title: note.title,
+          headerBackTitle: 'Notes',
+          headerRight: () => (
+            <Pressable onPress={handleToggleBookmark}>
+              <Ionicons
+                name={isBookmarked ? 'bookmark' : 'bookmark-outline'}
+                size={24}
+                color={isBookmarked ? theme.colors.accent : theme.colors.textSecondary}
+              />
+            </Pressable>
+          ),
         }}
       />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>{note.title}</Text>
-        <Text style={styles.content}>{note.content}</Text>
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.contentContainer}>
+          <Text style={styles.category}>{note.category}</Text>
+          <Text style={styles.title}>{note.title}</Text>
+          <View style={styles.separator} />
+          <Text style={styles.body}>{note.content}</Text>
+        </View>
       </ScrollView>
-
-      <View style={styles.stickyCTA}>
-        <Text style={styles.ctaText}>Quick Practice (Placeholder)</Text>
+      <View style={styles.ctaContainer}>
+        <Button label="Quick Practice" />
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: theme.colors.background },
-  scrollContent: { padding: theme.spacing.md, paddingBottom: 100 },
-  title: { ...theme.typography.h1, marginBottom: theme.spacing.md },
-  content: { ...theme.typography.body, fontSize: 18, lineHeight: 28 },
-  stickyCTA: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: theme.spacing.lg,
-    backgroundColor: theme.colors.card,
-    borderTopWidth: 1,
-    borderColor: theme.colors.border,
-    alignItems: 'center',
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
   },
-  ctaText: { ...theme.typography.body, fontWeight: 'bold', color: theme.colors.textSecondary },
+  scrollView: {
+    flex: 1,
+  },
+  contentContainer: {
+    padding: 24,
+  },
+  category: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    textTransform: 'uppercase',
+    marginBottom: 8,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: theme.colors.text,
+    marginBottom: 16,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: theme.colors.border,
+    marginVertical: 16,
+  },
+  body: {
+    fontSize: 16,
+    lineHeight: 24,
+    color: theme.colors.textSecondary,
+  },
+  ctaContainer: {
+    padding: 24,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+    backgroundColor: theme.colors.background,
+  },
 });

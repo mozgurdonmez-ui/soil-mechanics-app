@@ -1,32 +1,38 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { BOOKMARKS_NOTES } from './keys';
 
-const getBookmarksSet = async (): Promise<Set<string>> => {
+const BOOKMARKS_KEY = 'note_bookmarks';
+
+export const getBookmarkedNotes = async (): Promise<string[]> => {
   try {
-    const jsonValue = await AsyncStorage.getItem(BOOKMARKS_NOTES);
-    return jsonValue != null ? new Set(JSON.parse(jsonValue)) : new Set();
+    const jsonValue = await AsyncStorage.getItem(BOOKMARKS_KEY);
+    return jsonValue != null ? JSON.parse(jsonValue) : [];
   } catch (e) {
     console.error('Failed to load bookmarks.', e);
-    return new Set();
+    return [];
   }
 };
 
-export const getBookmarkedNoteIds = async (): Promise<Set<string>> => {
-  return getBookmarksSet();
+export const isNoteBookmarked = async (noteId: string): Promise<boolean> => {
+  const bookmarks = await getBookmarkedNotes();
+  return bookmarks.includes(noteId);
 };
 
-export const toggleBookmark = async (noteId: string): Promise<Set<string>> => {
-  const currentBookmarks = await getBookmarksSet();
-  if (currentBookmarks.has(noteId)) {
-    currentBookmarks.delete(noteId);
-  } else {
-    currentBookmarks.add(noteId);
-  }
+export const toggleBookmark = async (noteId: string): Promise<boolean> => {
   try {
-    const jsonValue = JSON.stringify(Array.from(currentBookmarks));
-    await AsyncStorage.setItem(BOOKMARKS_NOTES, jsonValue);
+    const bookmarks = await getBookmarkedNotes();
+    const isCurrentlyBookmarked = bookmarks.includes(noteId);
+    let newBookmarks: string[];
+
+    if (isCurrentlyBookmarked) {
+      newBookmarks = bookmarks.filter((id) => id !== noteId);
+    } else {
+      newBookmarks = [...bookmarks, noteId];
+    }
+
+    await AsyncStorage.setItem(BOOKMARKS_KEY, JSON.stringify(newBookmarks));
+    return !isCurrentlyBookmarked;
   } catch (e) {
-    console.error('Failed to save bookmarks.', e);
+    console.error('Failed to toggle bookmark.', e);
+    return false;
   }
-  return currentBookmarks;
 };

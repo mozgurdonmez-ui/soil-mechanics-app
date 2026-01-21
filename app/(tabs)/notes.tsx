@@ -1,120 +1,104 @@
-feat/phase-0-1-scaffold-8266443009613216044
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
-import { useRouter, useFocusEffect } from 'expo-router';
-import { theme } from '../../src/theme/tokens';
-import { notes } from '../../src/data/notes.seed';
-import type { Note } from '../../src/data/types';
-import { getBookmarkedNoteIds, toggleBookmark } from '../../src/storage/bookmarks';
-import AppHeader from '../../src/ui/AppHeader';
-import Card from '../../src/ui/Card';
-import Chip from '../../src/ui/Chip';
-import { Feather } from '@expo/vector-icons';
+import { View, StyleSheet, FlatList, Pressable } from 'react-native';
+import { Link, useFocusEffect } from 'expo-router';
+import { AppHeader, Card, Chip } from '@/src/ui';
+import { NOTES } from '@/src/data/notes.seed';
+import { Note } from '@/src/data/types';
+import { getBookmarkedNotes, toggleBookmark } from '@/src/storage/bookmarks';
+import { theme } from '@/src/theme';
 
-const TOPICS = ['All', 'Phase Relationships', 'Soil Classification', 'Effective Stress'];
+const CATEGORIES = ['All', 'Fundamentals', 'Classification', 'Stresses'];
 
 export default function NotesScreen() {
-  const router = useRouter();
-  const [activeTopic, setActiveTopic] = useState(TOPICS[0]);
-  const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
+  const [, forceUpdate] = useState({}); // To force re-render on bookmark
+
+  const loadBookmarks = async () => {
+    const ids = await getBookmarkedNotes();
+    setBookmarkedIds(ids);
+  };
 
   useFocusEffect(
     useCallback(() => {
-      getBookmarkedNoteIds().then(setBookmarkedIds);
+      loadBookmarks();
     }, [])
   );
 
-  const handleToggleBookmark = async (event: any, noteId: string) => {
-    event.stopPropagation();
-    const newBookmarkSet = await toggleBookmark(noteId);
-    setBookmarkedIds(newBookmarkSet);
+  const handleToggleBookmark = async (noteId: string) => {
+    await toggleBookmark(noteId);
+    // After toggling, reload bookmarks to update the UI state
+    await loadBookmarks();
+    forceUpdate({}); // Force a re-render to show bookmark state change immediately
   };
 
-  const filteredNotes = activeTopic === 'All' ? notes : notes.filter(note => note.topic === activeTopic);
+  const filteredNotes = activeCategory === 'All'
+    ? NOTES
+    : NOTES.filter((note) => note.category === activeCategory);
 
-  const renderNoteItem = ({ item }: { item: Note }) => {
-    const isBookmarked = bookmarkedIds.has(item.id);
-    return (
-      <Pressable onPress={() => router.push({ pathname: '/notes/detail', params: { id: item.id } })}>
-        <Card style={styles.noteCard}>
-          <View style={styles.noteHeader}>
-            <Text style={styles.noteTitle}>{item.title}</Text>
-            <Pressable onPress={(e) => handleToggleBookmark(e, item.id)} hitSlop={20}>
-              <Feather
-                name="bookmark"
-                size={20}
-                color={isBookmarked ? theme.colors.primary : theme.colors.border}
-              />
-            </Pressable>
-          </View>
-          <Text style={styles.noteInfo}>{item.topic} • {item.readingTime} min read</Text>
-        </Card>
+  const renderItem = ({ item }: { item: Note }) => (
+    <Link href={{ pathname: '/notes/detail', params: { id: item.id } }} asChild>
+      <Pressable>
+        <Card
+          title={item.title}
+          subtitle={item.category}
+          isBookmarked={bookmarkedIds.includes(item.id)}
+          onBookmarkPress={() => handleToggleBookmark(item.id)}
+        />
       </Pressable>
-    );
-  };
+    </Link>
+  );
 
   return (
     <View style={styles.container}>
       <AppHeader title="Notes" />
+      <View style={styles.filtersContainer}>
+        <FlatList
+          data={CATEGORIES}
+          renderItem={({ item }) => (
+            <Chip
+              label={item}
+              isActive={item === activeCategory}
+              onPress={() => setActiveCategory(item)}
+            />
+          )}
+          keyExtractor={(item) => item}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filtersContent}
+        />
+      </View>
       <FlatList
         data={filteredNotes}
-        renderItem={renderNoteItem}
-        keyExtractor={item => item.id}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
-        ListHeaderComponent={
-          <>
-            <View style={styles.chipsContainer}>
-              <FlatList
-                data={TOPICS}
-                renderItem={({ item }) => (
-                  <Chip
-                    label={item}
-                    isActive={item === activeTopic}
-                    onPress={() => setActiveTopic(item)}
-                  />
-                )}
-                keyExtractor={item => item}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ gap: theme.spacing.sm }}
-              />
-            </View>
-            <Text style={styles.sectionTitle}>All Notes</Text>
-          </>
-        }
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        extraData={bookmarkedIds} // Ensure FlatList re-renders when bookmarks change
       />
-
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-
-export default function NotesScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Notes</Text>
- main
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-feat/phase-0-1-scaffold-8266443009613216044
-  container: { flex: 1, backgroundColor: theme.colors.background },
-  listContent: { padding: theme.spacing.md },
-  chipsContainer: { marginBottom: theme.spacing.lg },
-  sectionTitle: { ...theme.typography.h2, fontSize: 20, marginBottom: theme.spacing.md },
-  noteCard: { marginBottom: theme.spacing.md },
-  noteHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: theme.spacing.xs },
-  noteTitle: { ...theme.typography.body, fontWeight: '600', flex: 1 },
-  noteInfo: { ...theme.typography.caption, color: theme.colors.textSecondary },
-
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: theme.colors.background,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+  filtersContainer: {
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
   },
- main
+  filtersContent: {
+    paddingHorizontal: 16,
+    gap: 8,
+  },
+  listContent: {
+    paddingHorizontal: 16,
+    paddingVertical: 24,
+  },
+  separator: {
+    height: 16,
+  },
 });
