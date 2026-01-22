@@ -375,6 +375,3 @@ Implement screens in this order (fastest visible progress, minimal dependencies)
 \- UI matches PNG layout and style closely
 
 \- Local persistence works for streak/XP/bookmarks
-
-
-
